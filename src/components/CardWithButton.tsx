@@ -11,6 +11,7 @@ export default function CardWithButton() {
         <CardTitle>Simple Button</CardTitle>
       </CardHeader>
       <CardContent>
+        <p>This button logs two lines to the console.</p>
         <Button onClick = {() => {console.log('clicked'); console.log(`API Base: ${apiBase}`)}} className="mt-4 w-full" variant="default" >
           Click
         </Button>
