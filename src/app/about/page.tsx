@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { Metadata } from 'next';
+import CardWithButton from '@/components/CardWithButton'
 
 export const metadata: Metadata = {
     title: "About Page",
@@ -7,6 +8,13 @@ export const metadata: Metadata = {
 }
 
 export default function AboutPage() {
+    return (<div>
+        <ProfileCard></ProfileCard>
+        <CardWithButton></CardWithButton>
+        </div>)
+}
+
+export function ProfileCard() {
     return (
   <div className="max-w-xs bg-white rounded-xl shadow-md overflow-hidden p-4 text-center">
         <Image 
