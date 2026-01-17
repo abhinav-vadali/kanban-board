@@ -18,7 +18,7 @@ export default function CountriesPage() {
       <h1 className="text-2xl font-semibold">Countries</h1>
       <ul className="list-disc pl-6">
         {data.countries.map((c: { code: string; name: string }) => (
-          <li key={c.code}>(c.name)</li>
+          <li key={c.code}>{c.name}</li>
         ))}
       </ul>
     </main>

@@ -17,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Provider>
        <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow">
           <div className="text-lg font-bold">
             MyApp
@@ -28,9 +29,13 @@ export default function RootLayout({
             <Link href="/about" className="hover:text-gray-300">
               About
             </Link>
+            <Link href="/countries" className="hover:text-gray-300">
+              Countries
+            </Link>
           </div>
         </nav>
-        <Provider>{children}</Provider>
+       {children}
+        </Provider>
       </body>
     </html>
   );
