@@ -33,7 +33,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@apollo/client": "^3.14.10"
+      "@apollo/client": "^3.14.0"
     }
   }
 }
