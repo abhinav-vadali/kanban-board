@@ -1,13 +1,20 @@
 'use client'
 import { PropsWithChildren } from 'react'
-import { ApolloProvider } from '@apollo/client'
-import { makeClient } from './apollo-client'
+import { NhostProvider } from '@nhost/react'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { nhost } from '@/lib/nhost'
 
-export default function Providers({ children }: PropsWithChildren) {
-  const client = makeClient()
+export default function Provider({ children }: PropsWithChildren) {
+  const client = new ApolloClient({
+    uri: nhost.graphql.url,
+    cache: new InMemoryCache(),
+  })
+
   return (
-    <ApolloProvider client={client}>
-      {children}
-    </ApolloProvider>
+    <NhostProvider nhost={nhost}>
+      <ApolloProvider client = {client}>
+        {children}
+      </ApolloProvider>
+    </NhostProvider>
   )
 }
