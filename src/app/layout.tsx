@@ -32,6 +32,9 @@ export default function RootLayout({
             <Link href="/countries" className="hover:text-gray-300">
               Countries
             </Link>
+            <Link href="/boards" className="hover:text-gray-300">
+              Boards
+            </Link>
           </div>
         </nav>
        {children}
