@@ -6,7 +6,7 @@ import { nhost } from '@/lib/nhost'
 
 export default function Provider({ children }: PropsWithChildren) {
   const client = new ApolloClient({
-    uri: nhost.graphql.url,
+    uri: nhost.graphql.httpUrl,
     cache: new InMemoryCache(),
   })
 
