@@ -1,7 +1,6 @@
 'use client'
 import { useAuthenticationStatus } from '@nhost/react'
 import AuthPage from './auth/page'
-import BoardPage from './boards/[boardId]/page'
 import SelectBoardPage from './boards/page'
 import { ClientOnly } from '../lib/ClientOnly'
 

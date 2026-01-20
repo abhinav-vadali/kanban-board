@@ -4,7 +4,6 @@ import { useAuthenticationStatus } from '@nhost/react'
 import { useParams } from 'next/navigation'
 import AuthPage from '../../auth/page'
 import Board from '@/components/Board'
-import { CARDS_BY_BOARD } from '@/graphql/cards'
 
 const BOARD_WITH_COLUMNS = gql`
   query BoardWithColumns($id: uuid!) {
@@ -49,7 +48,8 @@ export default function BoardPage() {
       <Board
         id={board.id}
         name={board.name}
-        columns = {data.columns}
+        color = "#EFD7D4"
+        boardColumns = {board.columns}
       />
     </div>
   )

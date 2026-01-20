@@ -4,6 +4,7 @@ import { useAuthenticationStatus, useSignOut, useNhostClient } from '@nhost/reac
 import { useRouter } from 'next/navigation'
 import { UserIcon, MenuIcon, InfoIcon, XIcon } from 'lucide-react'
 import { useQuery, gql } from '@apollo/client'
+import { USERS } from '../graphql/users'
 
 const BOARDS = gql`
   query Boards {
@@ -13,14 +14,7 @@ const BOARDS = gql`
     }
   }
 `
-const USERS = gql`
-  query Users {
-    users {
-      id
-      displayName
-    }
-  }
-`
+
   
 
 export default function Nav() {

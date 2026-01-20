@@ -1,51 +1,112 @@
-import { DragDropContext } from '@hello-pangea/dnd'
-import { Column } from './Column'
+'use client'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { UPDATE_CARD_POSITION } from '@/graphql/cards'
-import { BoardProps } from '../types/board'
+import { BoardProps, ColumnType } from '../types/board'
+import { Column } from './Column'
 
-export default function Board({ columns }): React.FC<BoardProps> {
-  const [updateCard] = useMutation(UPDATE_CARD_POSITION)
+// Pastel colors for columns
+const pastelColors = ['#FFD1DC', '#FFEDD5', '#FFFACD', '#D5FFCC', '#CDE7FF', '#E3D5FF']
 
-  const onDragEnd = async (result) => {
-    if (!result.destination) return
+const Board: React.FC<BoardProps> = ({ id, name, boardColumns }) => {
+  const [columns, setColumns] = useState<ColumnType[]>(boardColumns || [])
+  const [updateCardPosition] = useMutation(UPDATE_CARD_POSITION)
 
-    const { draggableId, destination, source } = result
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    )
+  const onDragEnd = async (result: DropResult) => {
+    const { source, destination, type } = result
+    if (!destination) return
+
+    if (type === 'COLUMN') {
+      // Move columns horizontally
+      const newColumns = Array.from(columns)
+      const [moved] = newColumns.splice(source.index, 1)
+      newColumns.splice(destination.index, 0, moved)
+      setColumns(newColumns)
       return
+    }
 
-    const destColumn = columns.find(
-      c => c.id === destination.droppableId
-    )
+    if (type === 'CARD') {
+      // Move cards within/between columns
+      const sourceCol = columns.find(c => c.id === source.droppableId)
+      const destCol = columns.find(c => c.id === destination.droppableId)
+      if (!sourceCol || !destCol) return
 
-    const prev = destColumn.cards[destination.index - 1]
-    const next = destColumn.cards[destination.index]
+      const sourceCards = Array.from(sourceCol.cards)
+      const destCards = sourceCol.id === destCol.id ? sourceCards : Array.from(destCol.cards)
 
-    let position = 0
-    if (prev && next) position = (prev.position + next.position) / 2
-    else if (prev) position = prev.position + 1
-    else if (next) position = next.position / 2
-    else position = 0
+      const [movingCard] = sourceCards.splice(source.index, 1)
+      destCards.splice(destination.index, 0, movingCard)
 
-    await updateCard({
-      variables: {
-        id: draggableId,
-        column_id: destination.droppableId,
-        position,
-      },
-    })
+      const newColumns = columns.map(c => {
+        if (c.id === sourceCol.id) return { ...c, cards: sourceCards }
+        if (c.id === destCol.id) return { ...c, cards: destCards }
+        return c
+      })
+
+      setColumns(newColumns)
+
+      // Persist to Nhost
+      try {
+        await updateCardPosition({
+          variables: {
+            id: movingCard.id,
+            column_id: destCol.id,
+            position: destination.index + 1,
+          },
+        })
+      } catch (err) {
+        console.error('Failed to update card position:', err)
+      }
+    }
   }
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex gap-6 overflow-x-auto">
-        {columns.map(col => (
-          <Column key={col.id} column={col} />
-        ))}
-      </div>
-    </DragDropContext>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">{name}</h1>
+
+      {columns.length === 0 ? (
+        <p className="text-gray-400 italic text-center py-8 w-full">
+          No columns yet. Add a column to get started!
+        </p>
+      ) : (
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="all-columns" type="COLUMN" direction="horizontal">
+            {(provided) => (
+              <div
+                className="flex gap-6 overflow-x-auto"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {columns.map((col: ColumnType, idx: number) => (
+                  <Draggable draggableId={col.id} index={idx} key={col.id}>
+                    {(colProvided) => (
+                      <div
+                        ref={colProvided.innerRef}
+                        {...colProvided.draggableProps}
+                        {...colProvided.dragHandleProps}
+                      >
+                        <Column
+                          id={col.id}
+                          name={col.name}
+                          cards={col.cards}
+                          position = {col.position}
+                          index = {idx}
+                          color={pastelColors[idx % pastelColors.length]}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      )}
+    </div>
   )
 }
+
+export default Board
