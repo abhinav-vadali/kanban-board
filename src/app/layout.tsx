@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from 'next/link'
+import Nav from '../components/Nav'
 import Provider from './providers'
 import "./globals.css";
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,26 +18,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Provider>
-       <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow">
-          <div className="text-lg font-bold">
-            MyApp
-          </div>
-          <div className="space-x-4">
-            <Link href="/" className="hover:text-gray-300">
-              Home
-            </Link>
-            <Link href="/about" className="hover:text-gray-300">
-              About
-            </Link>
-            <Link href="/countries" className="hover:text-gray-300">
-              Countries
-            </Link>
-            <Link href="/boards" className="hover:text-gray-300">
-              Boards
-            </Link>
-          </div>
-        </nav>
-       {children}
+          <Nav/>
+        <main className="pt-16">{children}</main>
         </Provider>
       </body>
     </html>

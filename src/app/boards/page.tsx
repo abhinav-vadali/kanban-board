@@ -1,12 +1,9 @@
 'use client'
-
-import { gql, useQuery } from '@apollo/client'
-import {
-  useAuthenticationStatus,
-  useSignInEmailPassword,
-  useSignUpEmailPassword,
-} from '@nhost/react'
 import { useState } from 'react'
+import { useQuery, gql } from '@apollo/client'
+import { useAuthenticationStatus } from '@nhost/react'
+import { useRouter } from 'next/navigation'
+import AuthPage from '../auth/page'
 
 const BOARDS = gql`
   query Boards {
@@ -17,115 +14,71 @@ const BOARDS = gql`
   }
 `
 
-export default function BoardsPage() {
-  /* ---------------- AUTH STATUS ---------------- */
-  const { isAuthenticated, isLoading: authLoading } =
-    useAuthenticationStatus()
-
-  /* ---------------- AUTH HOOKS ---------------- */
-  const {
-    signInEmailPassword,
-    isLoading: signingIn,
-    error: signInError,
-  } = useSignInEmailPassword()
-
-  const {
-    signUpEmailPassword,
-    isLoading: signingUp,
-    error: signUpError,
-  } = useSignUpEmailPassword()
-
-  /* ---------------- FORM STATE ---------------- */
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [mode, setMode] = useState<'signIn' | 'signUp'>('signIn')
-
-  /* ---------------- DATA QUERY ---------------- */
+export default function SelectBoardPage() {
+  const router = useRouter()
+  const { isAuthenticated, isLoading: authLoading } = useAuthenticationStatus()
   const { data, loading, error } = useQuery(BOARDS, {
     skip: !isAuthenticated,
   })
 
-  /* ---------------- LOADING AUTH ---------------- */
-  if (authLoading) {
-    return <p className="p-6">Checking authentication…</p>
+  const [selectedBoard, setSelectedBoard] = useState('')
+
+  // Loading / Auth checks
+  if (authLoading) return <p className="p-6">Checking authentication…</p>
+  if (!isAuthenticated) return <AuthPage />
+  if (loading) return <p className="p-6">Loading your boards…</p>
+  if (error) return <p className="p-6 text-red-500">Error: {error.message}</p>
+
+  const boards = data?.boards || []
+
+  const handleGo = () => {
+    if (!selectedBoard) return
+    // Navigate to board page
+    router.push(`/boards/${selectedBoard}`)
   }
 
-  /* ---------------- SIGN IN / SIGN UP ---------------- */
-  if (!isAuthenticated) {
-    return (
-      <div className="p-6 space-y-4 max-w-sm">
-        <h1 className="text-xl font-semibold">
-          {mode === 'signIn' ? 'Sign In' : 'Sign Up'}
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-lg p-8 space-y-6 text-center">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Welcome to Cupcake Factory Kanban
         </h1>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className="border px-2 py-1 rounded w-full"
-        />
+        <p className="text-gray-600">
+          Please select one of your boards from the dropdown below to get started.
+          You can view, edit, and manage tasks in your selected board.
+        </p>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          className="border px-2 py-1 rounded w-full"
-        />
-
-        <button
-          onClick={async () => {
-            if (mode === 'signIn') {
-              await signInEmailPassword(email, password)
-            } else {
-              await signUpEmailPassword(email, password)
-            }
-          }}
-          disabled={signingIn || signingUp}
-          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
-        >
-          {mode === 'signIn'
-            ? signingIn ? 'Signing in…' : 'Sign In'
-            : signingUp ? 'Signing up…' : 'Sign Up'}
-        </button>
-
-        {mode === 'signIn' && signInError && (
-          <p className="text-red-500">{signInError.message}</p>
-        )}
-        {mode === 'signUp' && signUpError && (
-          <p className="text-red-500">{signUpError.message}</p>
-        )}
-
-        <p className="text-sm text-gray-600">
-          {mode === 'signIn'
-            ? "Don't have an account? "
-            : 'Already have an account? '}
-          <button
-            className="underline"
-            onClick={() =>
-              setMode(mode === 'signIn' ? 'signUp' : 'signIn')
-            }
+        {/* Board selection */}
+        <div className="flex flex-col space-y-4">
+          <select
+            value={selectedBoard}
+            onChange={(e) => setSelectedBoard(e.target.value)}
+            className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {mode === 'signIn' ? 'Sign Up' : 'Sign In'}
+            <option value="">Select a board</option>
+            {boards.map((board: { id: string; name: string }) => (
+              <option key={board.id} value={board.id}>
+                {board.name}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={handleGo}
+            disabled={!selectedBoard}
+            className={`w-full py-2 rounded-xl font-semibold text-white transition ${
+              selectedBoard ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'
+            }`}
+          >
+            Go to Board
           </button>
+        </div>
+
+        <p className="text-gray-500 text-sm mt-2">
+          If you don’t have a board yet, you can create one from your dashboard.
         </p>
       </div>
-    )
-  }
-  console.log('auth', isAuthenticated, authLoading)
-  /* ---------------- BOARDS DATA ---------------- */
-  if (loading) return <p className="p-6">Loading boards…</p>
-  if (error)
-    return <p className="p-6 text-red-500">{error.message}</p>
-
-  if (!data || data.boards.length === 0) {
-    return <p className="p-6 text-gray-600">Nothing in boards</p>
-  } else return (
-    <ul className="p-6 list-disc pl-6">
-      {data.boards.map((b: { id: string; name: string }) => (
-        <li key={b.id}>{b.name}</li>
-      ))}
-    </ul>
+    </div>
   )
 }
