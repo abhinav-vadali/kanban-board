@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from 'next/link'
 import Provider from './providers'
-
 import "./globals.css";
 
 export const metadata: Metadata = {
