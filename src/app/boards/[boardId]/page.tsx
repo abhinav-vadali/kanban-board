@@ -3,7 +3,7 @@ import { useSubscription } from '@apollo/client'
 import { useAuthenticationStatus } from '@nhost/react'
 import { useParams } from 'next/navigation'
 import AuthPage from '../../auth/page'
-import Board from '@/components/Board'
+import Board from '@/components/BoardComponents/Board'
 import { BOARD_WITH_COLUMNS } from '@/graphql/boards'
 
 export default function BoardPage() {

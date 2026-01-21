@@ -1,30 +1,8 @@
 'use client'
-import { gql, useMutation } from '@apollo/client'
+import { useMutation, useSubscription } from '@apollo/client'
 import { useState } from 'react'
-
-export const CREATE_CARD = gql`
-  mutation CreateCard(
-    $title: String!
-    $description: String!
-    $column_id: uuid!
-    $position: float8!
-  ) {
-    insert_cards_one(
-      object: {
-        title: $title
-        description: $description
-        column_id: $column_id
-        position: $position
-      }
-    ) {
-      id
-      title
-      description
-      position
-      assignee
-    }
-  }
-`
+import { CREATE_CARD } from '../../graphql/cards'
+import { GET_USERS } from '../../graphql/users'
 
 interface AddCardButtonProps {
   columnId: string
@@ -35,9 +13,12 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
   columnId,
   currentCardsLength,
 }) => {
+    const { data: usersData} = useSubscription(GET_USERS)
+
   const [addingCard, setAddingCard] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [assignee, setAssignee] = useState('')
 
   const [createCard, { loading, error }] = useMutation(CREATE_CARD)
 
@@ -48,6 +29,7 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
       variables: {
         title,
         description: description || '',
+        assignee: assignee || '',
         column_id: columnId,
         position: currentCardsLength + 1,
       },
@@ -55,6 +37,7 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
 
     setTitle('')
     setDescription('')
+    setAssignee('')
     setAddingCard(false)
   }
 
@@ -84,6 +67,23 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
         onChange={(e) => setDescription(e.target.value)}
         className="rounded-md border px-2 py-1 text-sm"
       />
+
+     <select
+      value={assignee || ""}
+      onChange={(e) => setAssignee(e.target.value)}
+      className="rounded-md border px-2 py-1 text-sm w-full"
+    >
+      <option value="">Assigned to: (optional)</option>
+      {loading ? (
+        <option disabled>Loading users...</option>
+      ) : (
+        usersData?.users?.map((user: { id: string; displayName: string }) => (
+          <option key={user.id} value={user.id}>
+            {user.displayName}
+          </option>
+        ))
+      )}
+    </select>
 
       {error && (
         <p className="text-xs text-red-500">

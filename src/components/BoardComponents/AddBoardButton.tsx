@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { PlusIcon } from 'lucide-react'
-import { CREATE_BOARD, BOARDS } from '../graphql/boards'
+import { CREATE_BOARD, BOARDS } from '../../graphql/boards'
 
 export const AddBoardButton: React.FC<{ onBoardAdded?: () => void , refetchBoards?: () => void }> = ({ onBoardAdded }) => {
   const [isAdding, setIsAdding] = useState(false)

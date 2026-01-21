@@ -1,8 +1,10 @@
 import React from 'react'
 import { Droppable, DraggableProvidedDragHandleProps } from '@hello-pangea/dnd'
-import { TaskCard } from './TaskCard'
-import { ColumnProps } from '../types/board'
-import { AddCardButton } from './AddCardButton'
+import { TaskCard } from '../CardComponents/TaskCard'
+import { ColumnProps } from '../../types/column'
+import { AddCardButton } from '../CardComponents/AddCardButton'
+import DeleteColumnButton from './DeleteColumnButton'
+import EditColumnButton from './EditColumnButton'
 
 // Add dragHandleProps explicitly to props
 interface ColumnPropsWithHandle extends ColumnProps {
@@ -27,6 +29,7 @@ export const Column: React.FC<ColumnPropsWithHandle> = ({
         className="font-semibold text-lg mb-4 cursor-grab select-none"
       >
         {name}
+        <EditColumnButton id={id} initialName={name} />
       </div>
 
       {/* Cards droppable area */}
@@ -59,6 +62,7 @@ export const Column: React.FC<ColumnPropsWithHandle> = ({
 
             {droppableProvided.placeholder}
              <AddCardButton columnId={id} currentCardsLength={!cards? 0: cards.length} />
+             <DeleteColumnButton id = {id} columnName = {name}></DeleteColumnButton>
           </div>
         )}
       </Droppable>

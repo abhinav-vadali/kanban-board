@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { UserIcon, MenuIcon, InfoIcon, XIcon } from 'lucide-react'
 import { useSubscription, gql } from '@apollo/client'
 import { GET_USERS } from '../graphql/users'
-import { AddBoardButton } from './AddBoardButton'
+import { AddBoardButton } from './BoardComponents/AddBoardButton'
 
 const BOARDS = gql`
   subscription Boards {
@@ -27,15 +27,12 @@ export default function Nav() {
 
   // Fetch boards and users
   const { data: boardsData} = useSubscription(BOARDS, { skip: !isAuthenticated })
-  const { data: usersData } = useSubscription(GET_USERS, { skip: !isAuthenticated })
 
   const boards = boardsData?.boards || []
-  const users = usersData?.users || []
 
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [kanbanBoard, setKanbanBoard] = useState('')
-  const [assigneeColumn, setAssigneeColumn] = useState('')
 
   return (
     <>

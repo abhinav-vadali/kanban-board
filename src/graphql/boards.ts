@@ -39,9 +39,32 @@ export const BOARDS = gql`
   }
 `
 
-const BOARDS_SUBSCRIPTION = gql`
-  subscription Boards {
-    boards(order_by: { position: asc }) {
+export const DELETE_BOARD = gql`
+  mutation DeleteBoard($id: uuid!) {
+    # First delete all cards in all columns of the board
+    delete_cards(where: { column: { board_id: { _eq: $id } } }) {
+      affected_rows
+    }
+    # Then delete all columns in the board
+    delete_columns(where: { board_id: { _eq: $id } }) {
+      affected_rows
+    }
+    # Finally delete the board
+    delete_boards_by_pk(id: $id) {
+      id
+    }
+  }
+`
+
+export const UPDATE_BOARD = gql`
+  mutation UpdateBoard(
+    $id: uuid!
+    $name: String!
+  ) {
+    update_boards_by_pk(
+      pk_columns: { id: $id }
+      _set: { name: $name }
+    ) {
       id
       name
     }
