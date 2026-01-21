@@ -4,7 +4,6 @@ import { useAuthenticationStatus, useSignOut, useNhostClient } from '@nhost/reac
 import { useRouter } from 'next/navigation'
 import { UserIcon, MenuIcon, InfoIcon, XIcon } from 'lucide-react'
 import { useSubscription, gql } from '@apollo/client'
-import { GET_USERS } from '../graphql/users'
 import { AddBoardButton } from './BoardComponents/AddBoardButton'
 
 const BOARDS = gql`
@@ -48,7 +47,7 @@ export default function Nav() {
                 className="relative px-3 py-2 group"
               >
                 <MenuIcon className="w-6 h-6" />
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all group-hover:w-full"></span>
               </button>
             )}
             <span className="font-semibold text-lg">Cupcake Factory Kanban</span>
@@ -66,7 +65,7 @@ export default function Nav() {
                 className="relative px-3 py-2 font-medium transition-colors group"
               >
                 Sign Out
-                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all group-hover:w-full"></span>
               </button>
             )}
           </div>

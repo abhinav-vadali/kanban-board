@@ -7,7 +7,7 @@ import { CREATE_BOARD, BOARDS } from '../../graphql/boards'
 export const AddBoardButton: React.FC<{ onBoardAdded?: () => void , refetchBoards?: () => void }> = ({ onBoardAdded }) => {
   const [isAdding, setIsAdding] = useState(false)
   const [boardName, setBoardName] = useState('')
-  const [createBoard, { loading }] = useMutation(CREATE_BOARD, {
+  const [createBoard,] = useMutation(CREATE_BOARD, {
     refetchQueries: [BOARDS],
   })
 

@@ -20,7 +20,7 @@ export const Column: React.FC<ColumnPropsWithHandle> = ({
 }) => {
   return (
     <div
-      className="flex flex-col rounded-xl p-4 shadow-md min-w-[250px] max-w-[300px] bg-opacity-90"
+      className="flex flex-col rounded-xl p-4 shadow-md min-w-62.5 max-w-75 bg-opacity-90"
       style={{ backgroundColor: color }}
     >
       {/* Column header */}
@@ -38,7 +38,7 @@ export const Column: React.FC<ColumnPropsWithHandle> = ({
           <div
             ref={droppableProvided.innerRef}
             {...droppableProvided.droppableProps}
-            className={`flex flex-col gap-3 min-h-[50px] p-1 ${
+            className={`flex flex-col gap-3 min-h-12.5 p-1 ${
               snapshot.isDraggingOver ? 'bg-white/20 rounded-lg transition-all' : ''
             }`}
           >

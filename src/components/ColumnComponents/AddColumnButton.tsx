@@ -37,7 +37,7 @@ export function AddColumnButton({ boardId, existingColumnsCount }: AddColumnButt
     return (
       <button
         onClick={() => setIsAdding(true)}
-        className="flex-shrink-0 w-72 h-fit bg-white/50 hover:bg-white/80 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-4 transition-all duration-200 flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800"
+        className="shrink-0 w-72 h-fit bg-white/50 hover:bg-white/80 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg p-4 transition-all duration-200 flex items-center justify-center gap-2 text-gray-600 hover:text-gray-800"
       >
         <span className="text-xl">+</span>
         <span className="font-medium">Add Column</span>
@@ -46,7 +46,7 @@ export function AddColumnButton({ boardId, existingColumnsCount }: AddColumnButt
   }
 
   return (
-    <div className="flex-shrink-0 w-72 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div className="shrink-0 w-72 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
