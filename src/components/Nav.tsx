@@ -3,11 +3,12 @@ import { useState } from 'react'
 import { useAuthenticationStatus, useSignOut, useNhostClient } from '@nhost/react'
 import { useRouter } from 'next/navigation'
 import { UserIcon, MenuIcon, InfoIcon, XIcon } from 'lucide-react'
-import { useQuery, gql } from '@apollo/client'
-import { USERS } from '../graphql/users'
+import { useSubscription, gql } from '@apollo/client'
+import { GET_USERS } from '../graphql/users'
+import { AddBoardButton } from './AddBoardButton'
 
 const BOARDS = gql`
-  query Boards {
+  subscription Boards {
     boards(order_by: { position: desc }) {
       id
       name
@@ -25,8 +26,8 @@ export default function Nav() {
   const user = nhost.auth.getUser()
 
   // Fetch boards and users
-  const { data: boardsData } = useQuery(BOARDS, { skip: !isAuthenticated })
-  const { data: usersData } = useQuery(USERS, { skip: !isAuthenticated })
+  const { data: boardsData} = useSubscription(BOARDS, { skip: !isAuthenticated })
+  const { data: usersData } = useSubscription(GET_USERS, { skip: !isAuthenticated })
 
   const boards = boardsData?.boards || []
   const users = usersData?.users || []
@@ -114,31 +115,7 @@ export default function Nav() {
               ))}
            </select>
           </div>
-
-          {/* Assignee Column */}
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-1 font-medium">
-              Assignee Column
-              <button
-                className="text-white hover:text-gray-300"
-                onClick={() => alert('The tasks delegated to this person on the kanban board')}
-              >
-                <InfoIcon className="w-4 h-4" />
-              </button>
-            </label>
-            <select
-              value={assigneeColumn}
-              onChange={(e) => setAssigneeColumn(e.target.value)}
-              className="bg-blue-700 px-2 py-1 rounded text-white focus:outline-none"
-            >
-              <option value="">Select Column</option>
-              {users.map((u: { id: string, displayName: string }) => (
-                <option key={u.id} value={u.displayName}>
-                  {u.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
+          <AddBoardButton></AddBoardButton>
         </div>
       )}
     </>

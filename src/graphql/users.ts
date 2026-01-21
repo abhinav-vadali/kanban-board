@@ -1,16 +1,17 @@
 import { gql } from '@apollo/client'
 
-export const USERS = gql`
-  query Users {
+export const GET_USERS = gql`
+  subscription Users {
     users {
       id
       displayName
     }
   }
 `
+
 export const GET_USER = gql`
-  query GetUser($id: uuid!) {
-    users_by_pk(id: $id) {
+  subscription Users {
+    users {
       id
       displayName
     }

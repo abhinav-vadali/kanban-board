@@ -2,6 +2,7 @@ import React from 'react'
 import { Droppable, DraggableProvidedDragHandleProps } from '@hello-pangea/dnd'
 import { TaskCard } from './TaskCard'
 import { ColumnProps } from '../types/board'
+import { AddCardButton } from './AddCardButton'
 
 // Add dragHandleProps explicitly to props
 interface ColumnPropsWithHandle extends ColumnProps {
@@ -46,6 +47,7 @@ export const Column: React.FC<ColumnPropsWithHandle> = ({
                   title={card.title}
                   description={card.description}
                   assignee={card.assignee}
+                  assigneeName = {card.assigneeName}
                   index={idx}
                 />
               ))
@@ -56,6 +58,7 @@ export const Column: React.FC<ColumnPropsWithHandle> = ({
             )}
 
             {droppableProvided.placeholder}
+             <AddCardButton columnId={id} currentCardsLength={!cards? 0: cards.length} />
           </div>
         )}
       </Droppable>

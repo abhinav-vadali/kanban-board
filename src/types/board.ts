@@ -29,6 +29,7 @@ export interface CardType {
   description: string
   index: number
   assignee: string
+  assigneeName: string
 }
 
 export interface CardProps {
@@ -37,4 +38,5 @@ export interface CardProps {
   description: string
   index: number
   assignee: string
+  assigneeName: string
 }

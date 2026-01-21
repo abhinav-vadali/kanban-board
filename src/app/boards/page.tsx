@@ -1,12 +1,12 @@
 'use client'
 import { useState } from 'react'
-import { useQuery, gql } from '@apollo/client'
+import { useSubscription, gql } from '@apollo/client'
 import { useAuthenticationStatus } from '@nhost/react'
 import { useRouter } from 'next/navigation'
 import AuthPage from '../auth/page'
 
 const BOARDS = gql`
-  query Boards {
+  subscription Boards {
     boards(order_by: { position: desc }) {
       id
       name
@@ -17,7 +17,7 @@ const BOARDS = gql`
 export default function SelectBoardPage() {
   const router = useRouter()
   const { isAuthenticated, isLoading: authLoading } = useAuthenticationStatus()
-  const { data, loading, error } = useQuery(BOARDS, {
+  const { data, loading, error } = useSubscription(BOARDS, {
     skip: !isAuthenticated,
   })
 

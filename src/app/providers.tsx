@@ -1,8 +1,10 @@
 'use client'
-
 import { PropsWithChildren, useMemo, useState, useEffect } from 'react'
 import { NhostProvider } from '@nhost/react'
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink } from '@apollo/client'
+import { createClient } from 'graphql-ws'
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
+import { getMainDefinition } from '@apollo/client/utilities'
+import { ApolloClient, InMemoryCache, ApolloProvider, split, HttpLink } from '@apollo/client'
 import { nhost } from '@/lib/nhost'
 
 export default function Provider({ children }: PropsWithChildren) {
@@ -27,15 +29,34 @@ export default function Provider({ children }: PropsWithChildren) {
 
   // Create Apollo client
   const client = useMemo(() => {
+    
+    const httpLink = new HttpLink({
+      uri: nhost.graphql.httpUrl,
+      headers: userJwt ? { Authorization: `Bearer ${userJwt}` } : {},
+    })
+
+    // Only create WS link on client
+    const wsLink = new GraphQLWsLink(
+          createClient({
+            url: nhost.graphql.wsUrl,
+            connectionParams: {
+              headers: userJwt ? { Authorization: `Bearer ${userJwt}` } : {},
+            },
+          })
+        )
+    const link = wsLink
+      ? split(
+          ({ query }) => {
+            const def = getMainDefinition(query)
+            return def.kind === 'OperationDefinition' && def.operation === 'subscription'
+          },
+          wsLink,
+          httpLink
+        )
+      : httpLink
+
     return new ApolloClient({
-      link: new HttpLink({
-        uri: nhost.graphql.httpUrl,
-        headers: userJwt
-          ? {
-              Authorization: `Bearer ${userJwt}`, // JWT tells Hasura which role/user
-            }
-          : {},
-      }),
+      link: link,
       cache: new InMemoryCache(),
     })
   }, [userJwt])

@@ -1,17 +1,36 @@
 'use client'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
-import { useState } from 'react'
-import { useMutation } from '@apollo/client'
+import { useMemo, useState, useEffect } from 'react'
+import { useMutation, useSubscription } from '@apollo/client'
 import { UPDATE_CARD_POSITION } from '@/graphql/cards'
+import { GET_USERS } from '../graphql/users'
 import { BoardProps, ColumnType } from '../types/board'
 import { Column } from './Column'
 
 // Pastel colors for columns
 const pastelColors = ['#FFD1DC', '#FFEDD5', '#FFFACD', '#D5FFCC', '#CDE7FF', '#E3D5FF']
 
+
 const Board: React.FC<BoardProps> = ({ id, name, boardColumns }) => {
+
+
+  const { data: usersData } = useSubscription(GET_USERS)
+
+  const usersMap = useMemo(() => {
+  const map: Record<string, string> = {}
+  usersData?.users?.forEach((u: { id: string; displayName: string }) => {
+    map[u.id] = u.displayName
+  })
+  return map
+  }, [usersData])
+
   const [columns, setColumns] = useState<ColumnType[]>(boardColumns || [])
   const [updateCardPosition] = useMutation(UPDATE_CARD_POSITION)
+
+    useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setColumns(boardColumns || [])
+  }, [boardColumns])
 
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, type } = result
@@ -89,7 +108,7 @@ const Board: React.FC<BoardProps> = ({ id, name, boardColumns }) => {
                         <Column
                           id={col.id}
                           name={col.name}
-                          cards={col.cards}
+                          cards={col.cards.map(c => ({...c, assigneeName: usersMap[c.assignee] || 'Unassigned', }))}
                           position = {col.position}
                           index = {idx}
                           color={pastelColors[idx % pastelColors.length]}
@@ -110,3 +129,5 @@ const Board: React.FC<BoardProps> = ({ id, name, boardColumns }) => {
 }
 
 export default Board
+
+
