@@ -13,14 +13,14 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
   columnId,
   currentCardsLength,
 }) => {
-    const { data: usersData} = useSubscription(GET_USERS)
+  const { data: usersData, loading: usersLoading } = useSubscription(GET_USERS)
 
   const [addingCard, setAddingCard] = useState(false)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [assignee, setAssignee] = useState('')
 
-  const [createCard, { loading, error }] = useMutation(CREATE_CARD)
+  const [createCard, { loading: createLoading, error }] = useMutation(CREATE_CARD)
 
   const handleAddCard = async () => {
     if (!title.trim()) return
@@ -29,7 +29,7 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
       variables: {
         title,
         description: description || '',
-        assignee: assignee || '',
+        assignee: assignee || null,
         column_id: columnId,
         position: currentCardsLength + 1,
       },
@@ -68,22 +68,22 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
         className="rounded-md border px-2 py-1 text-sm"
       />
 
-     <select
-      value={assignee || ""}
-      onChange={(e) => setAssignee(e.target.value)}
-      className="rounded-md border px-2 py-1 text-sm w-full"
-    >
-      <option value="">Assigned to: (optional)</option>
-      {loading ? (
-        <option disabled>Loading users...</option>
-      ) : (
-        usersData?.users?.map((user: { id: string; displayName: string }) => (
-          <option key={user.id} value={user.id}>
-            {user.displayName}
-          </option>
-        ))
-      )}
-    </select>
+      <select
+        value={assignee || ""}
+        onChange={(e) => setAssignee(e.target.value)}
+        className="rounded-md border px-2 py-1 text-sm w-full"
+      >
+        <option value="">Assigned to: (optional)</option>
+        {usersLoading ? (
+          <option disabled>Loading users...</option>
+        ) : (
+          usersData?.users?.map((user: { id: string; displayName: string }) => (
+            <option key={user.id} value={user.id}>
+              {user.displayName}
+            </option>
+          ))
+        )}
+      </select>
 
       {error && (
         <p className="text-xs text-red-500">
@@ -94,7 +94,7 @@ export const AddCardButton: React.FC<AddCardButtonProps> = ({
       <div className="flex gap-2">
         <button
           onClick={handleAddCard}
-          disabled={loading}
+          disabled={createLoading}
           className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm disabled:opacity-50"
         >
           Save
