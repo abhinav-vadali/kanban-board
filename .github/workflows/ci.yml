@@ -12,3 +12,7 @@ jobs:
       - run: pnpm run lint
       - run: pnpm graphql-codegen
       - run: pnpm run build
+        env: 
+          NEXT_PUBLIC_NHOST_SUBDOMAIN: ${{secrets.NHOST_SUBDOMAIN}}
+          NEXT_PUBLIC_NHOST_REGION: us-east-1
+        
