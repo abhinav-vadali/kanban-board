@@ -1,0 +1,71 @@
+import React from 'react'
+import { Droppable, DraggableProvidedDragHandleProps } from '@hello-pangea/dnd'
+import { TaskCard } from '../CardComponents/TaskCard'
+import { ColumnProps } from '../../types/column'
+import { AddCardButton } from '../CardComponents/AddCardButton'
+import DeleteColumnButton from './DeleteColumnButton'
+import EditColumnButton from './EditColumnButton'
+
+// Add dragHandleProps explicitly to props
+interface ColumnPropsWithHandle extends ColumnProps {
+  dragHandleProps?: DraggableProvidedDragHandleProps
+}
+
+export const Column: React.FC<ColumnPropsWithHandle> = ({
+  id,
+  name,
+  cards,
+  color = '#E0E7FF',
+  dragHandleProps,
+}) => {
+  return (
+    <div
+      className="flex flex-col rounded-xl p-4 shadow-md min-w-62.5 max-w-75 bg-opacity-90"
+      style={{ backgroundColor: color }}
+    >
+      {/* Column header */}
+      <div
+        {...dragHandleProps} // attach header drag handle
+        className="font-semibold text-lg mb-4 cursor-grab select-none"
+      >
+        {name}
+        <EditColumnButton id={id} initialName={name} />
+      </div>
+
+      {/* Cards droppable area */}
+      <Droppable droppableId={id} type="CARD">
+        {(droppableProvided, snapshot) => (
+          <div
+            ref={droppableProvided.innerRef}
+            {...droppableProvided.droppableProps}
+            className={`flex flex-col gap-3 min-h-12.5 p-1 ${
+              snapshot.isDraggingOver ? 'bg-white/20 rounded-lg transition-all' : ''
+            }`}
+          >
+            {cards && cards.length > 0 ? (
+              cards.map((card, idx) => (
+                <TaskCard
+                  key={card.id}
+                  id={card.id}
+                  title={card.title}
+                  description={card.description}
+                  assignee={card.assignee}
+                  assigneeName = {card.assigneeName}
+                  index={idx}
+                />
+              ))
+            ) : (
+              <p className="text-gray-400 italic text-center py-4">
+                You don’t have any cards yet.
+              </p>
+            )}
+
+            {droppableProvided.placeholder}
+             <AddCardButton columnId={id} currentCardsLength={!cards? 0: cards.length} />
+             <DeleteColumnButton id = {id} columnName = {name}></DeleteColumnButton>
+          </div>
+        )}
+      </Droppable>
+    </div>
+  )
+}
